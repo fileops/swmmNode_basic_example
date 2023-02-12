@@ -2,7 +2,7 @@ var swmmnode = require('swmm-node')
 var fs = require ('fs')
 
 let test_Example1 = '../test/data/Example1.out'
-let text_output = '../test/data/Example1.txt'
+let text_output   = '../test/data/Example1.txt'
 
 fs.readFile(test_Example1, function (err, data) {
   processOut(data.buffer)
@@ -27,7 +27,7 @@ processOut = (arrBuff) => {
 }
 
 /**
- * Translate a float to a 12-character, 3-decimal string
+ * Translate a float to a n-character, 3-decimal string
  * padded with spaces.
  * @param {num} number input float number.
  * @return {string} a string that represents the number.
@@ -37,20 +37,20 @@ function floatString(num, len = 16) {
 }
 
 /**
- * Translate an int to a 12-character string
+ * Translate an int to a n-character string
  * padded with spaces.
  * @param {num} number input integer number.
- * @return {string} a string that represents the number.
+ * @returns {string} a formatted string that represents the number.
  */
 function intString(num, len = 16) {
   return num.toString().padEnd(len, ' ')
 }
 
 /**
- * Translate string to a 24-character string
+ * Translate string to a n-character string
  * padded with spaces.
  * @param {str} number input string.
- * @return {string} a formatted string.
+ * @returns {string} a formatted string.
  */
 function stringString(str, len = 24) {
   return str.padEnd(len, ' ')
@@ -60,7 +60,7 @@ function stringString(str, len = 24) {
  * Separate subheaders and section contents with a 50-string set
  * of '-' characters and a newline
  * @param {title} string represents the subheader
- * @return {string} a string that represents the number.
+ * @returns {string} a string that represents the number.
  */
 function subHeader(title, num = 50) {
   return title + '\n' +
@@ -70,8 +70,9 @@ function subHeader(title, num = 50) {
 /**
  * Separate column headers and section contents with a 50-string set
  * of '-' characters and a newline
- * @param {columns} Array<Array<string, length>> represents the column
- * @return {string} a string that represents the columns header.
+ * @param {columns} Array<Array<string, length>> represents the column name 
+ * and the length of space given to the column
+ * @returns {string} a string that represents the columns header.
  */
 function columnHeaders(columns) {
   let len = 0;
@@ -86,6 +87,7 @@ function columnHeaders(columns) {
  * Create Object names section substring
  * @param {count} number count of object names
  * @param {funcs} Array<function> function array that retrieves the object value
+ * @returns {string} A string representing the Object Names section.
  */
 function objectNames(count, funcs){
   let str = ''
@@ -95,8 +97,8 @@ function objectNames(count, funcs){
       str += stringString(f(i,).toString(), 16)
     })
     str += '\n'
-     
   } 
+
   return str + '\n'
 }
 
@@ -109,6 +111,7 @@ function objectNames(count, funcs){
  * @param {subheaders} Array<Array><string, int> array that describes the subheaders
  * @param {timePeriods} number count of time periods
  * @param {timeFunc} function function that translates time periods
+ * @returns {string} a string representing a time-based subsection.
  */
 function timeOuput(iCount, vCount, nameFunc, func, subheaders, timePeriods, timeFunc){
   let str = ''
@@ -125,6 +128,7 @@ function timeOuput(iCount, vCount, nameFunc, func, subheaders, timePeriods, time
     }
     str += '\n'
   } 
+
   return str + '\n'
 }
 
@@ -135,6 +139,7 @@ function timeOuput(iCount, vCount, nameFunc, func, subheaders, timePeriods, time
  * @param {subheaders} Array<Array><string, int> array that describes the subheaders
  * @param {timePeriods} number count of time periods
  * @param {timeFunc} function function that translates time periods
+ * @returns {string} A string representing the System time-based subsection.
  */
 function timeOuputSys(vCount, func, subheaders, timePeriods, timeFunc){
   let str = columnHeaders(subheaders)
@@ -150,8 +155,9 @@ function timeOuputSys(vCount, func, subheaders, timePeriods, timeFunc){
 }
 
 /**
- * Separate section titles and section contents with a 50-string set
+ * Separate section titles and section contents with a 50 or num string set
  * of '=' characters and a newline
+ * @param {number} [num] (Optional) the count of '=' characters to write.
  * @return {string} a string that represents the number.
  */
 function headerLine(num = 50) {
@@ -159,7 +165,8 @@ function headerLine(num = 50) {
 }
 
 /**
- * Break sections with 3 newline charaters
+ * Break sections with 2 or num newline charaters
+ * @param {number} [num] (Optional) the count of newline characters to make
  * @return {string} a string that represents the number.
  */
 function sectionBreak(num = 2) {
@@ -194,6 +201,7 @@ function stringOpeningRecords(outObj){
     + simpleLine(intString(outObj.linkCount()),     0, 5)
     + simpleLine(intString(outObj.pollutantCount()),0, 6)
     + sectionBreak()
+
   return section;
 }
 
@@ -212,6 +220,7 @@ function stringClosingRecords(outObj){
     + simpleLine(intString(outObj.errorCode()),        6, 4)
     + simpleLine(intString(outObj.magic2()),           6, 5)
     + sectionBreak()
+
   return section;
 }
 
@@ -243,6 +252,7 @@ function stringObjectIDs(outObj){
     + columnHeaders([['index', 16], ['Units', 24]])
     + objectNames(outObj.pollutantCount(),    [outObj.pollutantConcentrationUnits.bind(outObj)])
     + sectionBreak()
+
   return section;
 }
 
@@ -282,8 +292,8 @@ function stringObjectProperties(outObj){
       outObj.linkMaximumDepth.bind(outObj),
       outObj.linkLength.bind(outObj),
     ])
-    
     + sectionBreak()
+
   return section;
 }
 
@@ -299,6 +309,7 @@ function stringReportingInterval(outObj){
     + simpleLine(stringString(outObj.swmmStepToDate(0)),     4, 0)
     + simpleLine(stringString(outObj.timeStep().toString()), 4, 1)
     + sectionBreak()
+
   return section;
 }
 
@@ -315,6 +326,7 @@ function stringComputedResults(outObj){
     + stringLinkResults(outObj)
     + stringSystemResults(outObj)
     + sectionBreak()
+    
   return section;
 }
 
@@ -324,9 +336,9 @@ function stringComputedResults(outObj){
  * @return: {string} String representation of the Subcatchment Computed Results section of a swmm.out file.
  */
 function stringSubcatchmentResults(outObj){
-  let subheaders = [['Date/Time', 24], ['Rainfall', 20], ['Snow Depth', 20], ['Evap loss', 20],
-  ['Infil loss', 20], ['Runoff', 20], ['GW flow', 20], ['GW elevation', 20],
-  ['Soil moisture', 20]]
+  let subheaders = [['Date/Time', 24], ['Rainfall',     20], ['Snow Depth',    20],  
+                    ['Evap loss', 20], ['Infil loss',   20], ['Runoff',        20], 
+                    ['GW flow',   20], ['GW elevation', 20], ['Soil moisture', 20]]
   // Add pollutants
   for(i = 0; i < outObj.pollutantCount(); i++){
     subheaders.push([outObj.pollutantName(i), 20])
@@ -350,8 +362,9 @@ function stringSubcatchmentResults(outObj){
  * @return: {string} String representation of the Node Computed Results section of a swmm.out file.
  */
 function stringNodeResults(outObj){
-  let subheaders = [['Date/Time', 24], ['Depth', 20], ['Head', 20], ['Volume', 20],
-  ['Lat. Inflow', 20], ['Node Inflow', 20], ['Node overflow', 20]]
+  let subheaders = [['Date/Time',     24], ['Depth',       20], ['Head',        20],
+                    ['Volume',        20], ['Lat. Inflow', 20], ['Node Inflow', 20], 
+                    ['Node overflow', 20]]
   // Add pollutants
   for(i = 0; i < outObj.pollutantCount(); i++){
     subheaders.push([outObj.pollutantName(i), 20])
@@ -375,8 +388,8 @@ function stringNodeResults(outObj){
  * @return: {string} String representation of the Link Computed Results section of a swmm.out file.
  */
 function stringLinkResults(outObj){
-  let subheaders = [['Date/Time', 24], ['Flow', 20], ['Depth', 20], ['Velocity', 20],
-  ['Volume', 20], ['Capacity', 20]]
+  let subheaders = [['Date/Time', 24], ['Flow',   20], ['Depth',    20], 
+                    ['Velocity',  20], ['Volume', 20], ['Capacity', 20]]
   // Add pollutants
   for(i = 0; i < outObj.pollutantCount(); i++){
     subheaders.push([outObj.pollutantName(i), 20])
@@ -400,10 +413,12 @@ function stringLinkResults(outObj){
  * @return: {string} String representation of the System Computed Results section of a swmm.out file.
  */
 function stringSystemResults(outObj){
-  let subheaders = [['Date/Time', 24], ['Temperature', 20], ['Rainfall', 20], ['Snow Depth', 20],
-  ['Infiltration', 20], ['Runoff', 20], ['DWF', 20], ['GWF', 20], ['RDII', 20],
-  ['Ex. Inflow', 20], ['Inflow', 20], ['Flooding', 20], ['Outflow', 20], ['Storage', 20],
-  ['Evap.', 20], ['PET', 20]]
+  let subheaders = [['Date/Time',  24], ['Temperature',  20], ['Rainfall', 20], 
+                    ['Snow Depth', 20], ['Infiltration', 20], ['Runoff',   20], 
+                    ['DWF',        20], ['GWF',          20], ['RDII',     20],
+                    ['Ex. Inflow', 20], ['Inflow',       20], ['Flooding', 20], 
+                    ['Outflow',    20], ['Storage',      20], ['Evap.',    20], 
+                    ['PET',        20]]
 
   let section = subHeader('System')
     + timeOuputSys(
