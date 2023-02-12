@@ -1,8 +1,8 @@
 var swmmnode = require('swmm-node')
 var fs = require ('fs')
 
-let test_Example1 = './test/data/Example1.out'
-let text_output = './test/data/Example1.txt'
+let test_Example1 = '../test/data/Example1.out'
+let text_output = '../test/data/Example1.txt'
 
 fs.readFile(test_Example1, function (err, data) {
   processOut(data.buffer)
@@ -13,10 +13,12 @@ processOut = (arrBuff) => {
   let outString = ''
   console.log(example1.version())
 
-  outString += stringOpeningRecords  (example1)
-  outString += stringObjectIDs       (example1)
-  outString += stringObjectProperties(example1)
-  outString += stringClosingRecords  (example1)
+  outString += stringOpeningRecords   (example1)
+  outString += stringObjectIDs        (example1)
+  outString += stringObjectProperties (example1)
+  outString += stringReportingInterval(example1)
+  
+  outString += stringClosingRecords   (example1)
   outString += '\n'
   
   // Get all of the system variables at a specific time period
@@ -248,6 +250,21 @@ function stringObjectProperties(outObj){
       outObj.linkLength.bind(outObj),
     ])
     
+    + sectionBreak()
+  return section;
+}
+
+
+/**
+ * Change the Reporting Interval of a swmm .out file to a string.
+ * @param {outObj} swmmnode.SwmmOut object.
+ * @return: {string} String representation of the Reporting Interval section of a swmm.out file.
+ */
+function stringReportingInterval(outObj){
+  let section = swmmnode.SwmmOut.sections[4].name += '\n'
+    + headerLine()
+    + simpleLine(stringString(outObj.swmmStepToDate(0)),     4, 0)
+    + simpleLine(stringString(outObj.timeStep().toString()), 4, 1)
     + sectionBreak()
   return section;
 }

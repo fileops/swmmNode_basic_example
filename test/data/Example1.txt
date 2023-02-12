@@ -131,6 +131,12 @@ index           ID              Type            US Invert       DS Invert       
 
 
 
+REPORTING INTERVAL
+==================================================
+01/01/1998 00:00:00     Report Start Date
+3600                    Reporting interval
+
+
 CLOSING RECORDS
 ==================================================
 28              Object IDs
