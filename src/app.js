@@ -11,30 +11,14 @@ fs.readFile(test_Example1, function (err, data) {
 processOut = (arrBuff) => {
   let example1 = new swmmnode.SwmmOut(arrBuff)
   let outString = ''
-  console.log(example1.version())
 
   outString += stringOpeningRecords   (example1)
   outString += stringObjectIDs        (example1)
   outString += stringObjectProperties (example1)
   outString += stringReportingInterval(example1)
-  
+  outString += stringComputedResults  (example1)
   outString += stringClosingRecords   (example1)
   outString += '\n'
-  
-  // Get all of the system variables at a specific time period
-  /*sys_idx_max = example1.systemOutputCount()
-  period_max = example1.reportingPeriods()
-  
-  for(period = 1; period <= period_max; period++){
-    let time = example1.swmmStepToDate(period)
-
-    outString += period.toString().padEnd(12, ' ')
-    outString += time  .toString().padEnd(25, ' ')
-    for(index = 0; index < sys_idx_max; index++){
-      outString += example1.sysOutput(index, period).toFixed(3).toString().padEnd(12, ' ')
-    }
-    outString += '\n'
-  }*/
 
   fs.writeFile(text_output, outString, (err) => {
     if (err) console.log(err)
@@ -48,8 +32,8 @@ processOut = (arrBuff) => {
  * @param {num} number input float number.
  * @return {string} a string that represents the number.
  */
-function floatString(num) {
-  return num.toFixed(3).toString().padEnd(12, ' ')
+function floatString(num, len = 16) {
+  return num.toFixed(3).toString().padEnd(len, ' ')
 }
 
 /**
@@ -115,6 +99,40 @@ function objectNames(count, funcs){
   } 
   return str + '\n'
 }
+
+/**
+ * Create time-based subsection
+ * @param {iCount} number count of object names
+ * @param {vCount} number count of object variables
+ * @param {nameFunc} function function to get an object name
+ * @param {func} function function that retrieves the object value
+ * @param {subheaders} Array<Array><string, int> array that describes the subheaders
+ * @param {timePeriods} number count of time periods
+ * @param {timeFunc} function function that translates time periods
+ */
+function timeOuput(iCount, vCount, nameFunc, func, subheaders, timePeriods, timeFunc){
+  console.log(iCount)
+  console.log(vCount)
+  console.log(nameFunc)
+  console.log(func)
+  console.log(timePeriods)
+  let str = ''
+  for(i = 0; i < iCount; i++){
+    str += columnHeaders([['index', 16], ['ID', 24]])
+    str += intString(i) + stringString(nameFunc(i)) + '\n'
+    str += columnHeaders(subheaders)
+    for(j = 1; j <= timePeriods; j++){
+      str += stringString(timeFunc(j), 24)
+      for(k = 0; k < vCount; k++){
+        str += floatString(func(i, k, j), 20)
+      }
+      str += '\n'
+    }
+    str += '\n'
+  } 
+  return str + '\n'
+}
+
 
 /**
  * Separate section titles and section contents with a 50-string set
@@ -268,3 +286,95 @@ function stringReportingInterval(outObj){
     + sectionBreak()
   return section;
 }
+
+/**
+ * Change the Computed Results section of a swmm .out file to a string.
+ * @param {outObj} swmmnode.SwmmOut object.
+ * @return: {string} String representation of the Computed Results section of a swmm.out file.
+ */
+function stringComputedResults(outObj){
+  let section = swmmnode.SwmmOut.sections[5].name += '\n'
+    + headerLine()
+    + stringSubcatchmentResults(outObj)
+    + stringNodeResults(outObj)
+    + stringLinkResults(outObj)
+    + sectionBreak()
+  return section;
+}
+
+/**
+ * Change the Subcatchment Computed Results section of a swmm .out file to a string.
+ * @param {outObj} swmmnode.SwmmOut object.
+ * @return: {string} String representation of the Subcatchment Computed Results section of a swmm.out file.
+ */
+function stringSubcatchmentResults(outObj){
+  let subheaders = [['Date/Time', 24], ['Rainfall', 20], ['Snow Depth', 20], ['Evap loss', 20],
+  ['Infil loss', 20], ['Runoff', 20], ['GW flow', 20], ['GW elevation', 20],
+  ['Soil moisture', 20]]
+  // Add pollutants
+  for(i = 0; i < outObj.pollutantCount(); i++){
+    subheaders.push([outObj.pollutantName(i), 20])
+  }
+  let section = subHeader('Subcatchments')
+    + timeOuput(
+      outObj.subcatchmentCount(), 
+      outObj.subcatchmentOutputCount(),
+      outObj.subcatchmentName.bind(outObj),
+      outObj.subcatchmentOutput.bind(outObj),
+      subheaders,
+      outObj.reportingPeriods(),
+      outObj.swmmStepToDate.bind(outObj),)
+    
+  return section;
+}
+
+/**
+ * Change the Node Computed Results section of a swmm .out file to a string.
+ * @param {outObj} swmmnode.SwmmOut object.
+ * @return: {string} String representation of the Node Computed Results section of a swmm.out file.
+ */
+function stringNodeResults(outObj){
+  let subheaders = [['Date/Time', 24], ['Depth', 20], ['Head', 20], ['Volume', 20],
+  ['Lat. Inflow', 20], ['Node Inflow', 20], ['Node overflow', 20]]
+  // Add pollutants
+  for(i = 0; i < outObj.pollutantCount(); i++){
+    subheaders.push([outObj.pollutantName(i), 20])
+  }
+  let section = subHeader('Nodes')
+    + timeOuput(
+      outObj.nodeCount(), 
+      outObj.nodeOutputCount(),
+      outObj.nodeName.bind(outObj),
+      outObj.nodeOutput.bind(outObj),
+      subheaders,
+      outObj.reportingPeriods(),
+      outObj.swmmStepToDate.bind(outObj),)
+    
+  return section;
+}
+
+/**
+ * Change the Link Computed Results section of a swmm .out file to a string.
+ * @param {outObj} swmmnode.SwmmOut object.
+ * @return: {string} String representation of the Link Computed Results section of a swmm.out file.
+ */
+function stringLinkResults(outObj){
+  let subheaders = [['Date/Time', 24], ['Flow', 20], ['Depth', 20], ['Velocity', 20],
+  ['Volume', 20], ['Capacity', 20]]
+  // Add pollutants
+  for(i = 0; i < outObj.pollutantCount(); i++){
+    subheaders.push([outObj.pollutantName(i), 20])
+  }
+  let section = subHeader('Links')
+    + timeOuput(
+      outObj.linkCount(), 
+      outObj.linkOutputCount(),
+      outObj.linkName.bind(outObj),
+      outObj.linkOutput.bind(outObj),
+      subheaders,
+      outObj.reportingPeriods(),
+      outObj.swmmStepToDate.bind(outObj),)
+    
+  return section;
+}
+
