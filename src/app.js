@@ -111,11 +111,6 @@ function objectNames(count, funcs){
  * @param {timeFunc} function function that translates time periods
  */
 function timeOuput(iCount, vCount, nameFunc, func, subheaders, timePeriods, timeFunc){
-  console.log(iCount)
-  console.log(vCount)
-  console.log(nameFunc)
-  console.log(func)
-  console.log(timePeriods)
   let str = ''
   for(i = 0; i < iCount; i++){
     str += columnHeaders([['index', 16], ['ID', 24]])
@@ -133,6 +128,26 @@ function timeOuput(iCount, vCount, nameFunc, func, subheaders, timePeriods, time
   return str + '\n'
 }
 
+/**
+ * Create time-based subsection
+ * @param {vCount} number count of object variables
+ * @param {func} function function that retrieves the object value
+ * @param {subheaders} Array<Array><string, int> array that describes the subheaders
+ * @param {timePeriods} number count of time periods
+ * @param {timeFunc} function function that translates time periods
+ */
+function timeOuputSys(vCount, func, subheaders, timePeriods, timeFunc){
+  let str = columnHeaders(subheaders)
+  for(j = 1; j <= timePeriods; j++){
+    str += stringString(timeFunc(j), 24)
+    for(k = 0; k < vCount; k++){
+      str += floatString(func(k, j), 20)
+    }
+    str += '\n'
+  }
+
+  return str + '\n'
+}
 
 /**
  * Separate section titles and section contents with a 50-string set
@@ -298,6 +313,7 @@ function stringComputedResults(outObj){
     + stringSubcatchmentResults(outObj)
     + stringNodeResults(outObj)
     + stringLinkResults(outObj)
+    + stringSystemResults(outObj)
     + sectionBreak()
   return section;
 }
@@ -323,7 +339,7 @@ function stringSubcatchmentResults(outObj){
       outObj.subcatchmentOutput.bind(outObj),
       subheaders,
       outObj.reportingPeriods(),
-      outObj.swmmStepToDate.bind(outObj),)
+      outObj.swmmStepToDate.bind(outObj))
     
   return section;
 }
@@ -348,7 +364,7 @@ function stringNodeResults(outObj){
       outObj.nodeOutput.bind(outObj),
       subheaders,
       outObj.reportingPeriods(),
-      outObj.swmmStepToDate.bind(outObj),)
+      outObj.swmmStepToDate.bind(outObj))
     
   return section;
 }
@@ -373,8 +389,32 @@ function stringLinkResults(outObj){
       outObj.linkOutput.bind(outObj),
       subheaders,
       outObj.reportingPeriods(),
-      outObj.swmmStepToDate.bind(outObj),)
+      outObj.swmmStepToDate.bind(outObj))
     
   return section;
 }
+
+/**
+ * Change the System Computed Results section of a swmm .out file to a string.
+ * @param {outObj} swmmnode.SwmmOut object.
+ * @return: {string} String representation of the System Computed Results section of a swmm.out file.
+ */
+function stringSystemResults(outObj){
+  let subheaders = [['Date/Time', 24], ['Temperature', 20], ['Rainfall', 20], ['Snow Depth', 20],
+  ['Infiltration', 20], ['Runoff', 20], ['DWF', 20], ['GWF', 20], ['RDII', 20],
+  ['Ex. Inflow', 20], ['Inflow', 20], ['Flooding', 20], ['Outflow', 20], ['Storage', 20],
+  ['Evap.', 20], ['PET', 20]]
+
+  let section = subHeader('System')
+    + timeOuputSys(
+      outObj.systemOutputCount(),
+      outObj.sysOutput.bind(outObj),
+      subheaders,
+      outObj.reportingPeriods(),
+      outObj.swmmStepToDate.bind(outObj))
+  
+  return section;
+}
+
+
 
