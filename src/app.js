@@ -18,7 +18,6 @@ processOut = (arrBuff) => {
   outString += stringReportingInterval(example1)
   outString += stringComputedResults  (example1)
   outString += stringClosingRecords   (example1)
-  outString += '\n'
 
   fs.writeFile(text_output, outString, (err) => {
     if (err) console.log(err)
@@ -326,7 +325,7 @@ function stringComputedResults(outObj){
     + stringLinkResults(outObj)
     + stringSystemResults(outObj)
     + sectionBreak()
-    
+
   return section;
 }
 
