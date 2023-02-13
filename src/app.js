@@ -1,24 +1,37 @@
 var swmmnode = require('swmm-node')
 var fs = require ('fs')
 
-let test_Example1 = '../test/data/Example1.out'
-let text_output   = '../test/data/Example1.txt'
+// Change the following line to the name of your .out
+// file and place your .out file in the src directory.
+// For a more complex file structure, you should make an 
+// input folder and place your .out files there.
+let test_Example1 = './Example1.out'
+// Change the following name to the output name you want.
+// For a more complex file structure, you should make a
+// output folder and direct your text file there.
+let text_output   = './Example1.txt'
 
+// Read in the .out file and process the results.
 fs.readFile(test_Example1, function (err, data) {
   processOut(data.buffer)
 })
 
+// Process an array buffer. This is usually the 
+// buffer contents of a .out file.
 processOut = (arrBuff) => {
+  // Create a swmmOut oubject from the contents of the .out file.
   let example1 = new swmmnode.SwmmOut(arrBuff)
-  let outString = ''
 
-  outString += stringOpeningRecords   (example1)
+  // Process all sections of the .out file.
+  let outString 
+             = stringOpeningRecords   (example1)
   outString += stringObjectIDs        (example1)
   outString += stringObjectProperties (example1)
   outString += stringReportingInterval(example1)
   outString += stringComputedResults  (example1)
   outString += stringClosingRecords   (example1)
 
+  // Write the data to your output file.
   fs.writeFile(text_output, outString, (err) => {
     if (err) console.log(err)
     else console.log('output written to file: ' + text_output)
