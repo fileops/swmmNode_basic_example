@@ -1,4 +1,4 @@
-var swmmnode = require('swmm-node')
+var swmmnode = require('@swmm-js/swmm-node')
 var fs = require ('fs')
 
 // Change the following line to the name of your .out
