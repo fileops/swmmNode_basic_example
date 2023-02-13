@@ -51,9 +51,9 @@ node app.js
 
 # Modifying the example
 
-You can modify the demo to work with your own files. THe following is a short set of simple changes you can make right away.
+You can modify the demo to work with your own files. The following is a short set of simple changes you can make right away.
 
-## Install your own .inp file
+## Install your own .out file
 
 In File Explorer, go to the directory:
 ```
