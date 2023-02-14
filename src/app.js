@@ -203,7 +203,7 @@ function simpleLine(val, section, content) {
  * @return: {string} String representation of the opening records section of a swmm.out file.
  */
 function stringOpeningRecords(outObj){
-  let section = swmmnode.SwmmOut.sections[0].name += '\n'
+  let section = swmmnode.SwmmOut.sections[0].name + '\n'
     + headerLine()
     + simpleLine(intString(outObj.magic1()),        0, 0)
     + simpleLine(intString(outObj.version()),       0, 1)
@@ -223,7 +223,7 @@ function stringOpeningRecords(outObj){
  * @return: {string} String representation of the closing records section of a swmm.out file.
  */
 function stringClosingRecords(outObj){
-  let section = swmmnode.SwmmOut.sections[6].name += '\n'
+  let section = swmmnode.SwmmOut.sections[6].name + '\n'
     + headerLine()
     + simpleLine(intString(outObj.objectIDNames()),    6, 0)
     + simpleLine(intString(outObj.objectProperties()), 6, 1)
@@ -242,7 +242,7 @@ function stringClosingRecords(outObj){
  * @return: {string} String representation of the cObject IDs section of a swmm.out file.
  */
 function stringObjectIDs(outObj){
-  let section = swmmnode.SwmmOut.sections[1].name += '\n'
+  let section = swmmnode.SwmmOut.sections[1].name + '\n'
     + headerLine()
     + subHeader('Subcatchments')
     + columnHeaders([['index', 16], ['ID', 24]])
@@ -274,7 +274,7 @@ function stringObjectIDs(outObj){
  * @return: {string} String representation of the cObject Properties section of a swmm.out file.
  */
 function stringObjectProperties(outObj){
-  let section = swmmnode.SwmmOut.sections[2].name += '\n'
+  let section = swmmnode.SwmmOut.sections[2].name + '\n'
     + headerLine()
     + subHeader('Subcatchments')
     + columnHeaders([['index', 16], ['ID', 24], ['Area', 16]])
@@ -316,7 +316,7 @@ function stringObjectProperties(outObj){
  * @return: {string} String representation of the Reporting Interval section of a swmm.out file.
  */
 function stringReportingInterval(outObj){
-  let section = swmmnode.SwmmOut.sections[4].name += '\n'
+  let section = swmmnode.SwmmOut.sections[4].name + '\n'
     + headerLine()
     + simpleLine(stringString(outObj.swmmStepToDate(0)),     4, 0)
     + simpleLine(stringString(outObj.timeStep().toString()), 4, 1)
@@ -331,7 +331,7 @@ function stringReportingInterval(outObj){
  * @return: {string} String representation of the Computed Results section of a swmm.out file.
  */
 function stringComputedResults(outObj){
-  let section = swmmnode.SwmmOut.sections[5].name += '\n'
+  let section = swmmnode.SwmmOut.sections[5].name + '\n'
     + headerLine()
     + stringSubcatchmentResults(outObj)
     + stringNodeResults(outObj)
